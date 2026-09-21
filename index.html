@@ -12,7 +12,7 @@
 <script>
 (async()=>{
   try{
-    const r=await fetch('./season-v4.html?v=8',{cache:'no-store'});
+    const r=await fetch('./season-v4.html?v=9',{cache:'no-store'});
     if(!r.ok) throw new Error('season-v4');
     let html=await r.text();
 
@@ -23,8 +23,12 @@
     const oldRender="w.render=function(){original();translate(d.getElementById('stage'),id);detect(frame,id)};w.__seasonV4Patched=true";
     const newRender="w.render=function(){original();translate(d.getElementById('stage'),id);const sc=d.querySelector('main');if(sc)sc.scrollTop=0;detect(frame,id)};w.__seasonV4Patched=true";
     html=html.replace(oldRender,newRender);
-    html=html.replaceAll('&v=4&t=','&v=8&t=');
-    html=html.replace("./i18n/strings-el.json?v=4","./i18n/strings-el.json?v=8");
+    html=html.replaceAll('&v=4&t=','&v=9&t=');
+    html=html.replace("./i18n/strings-el.json?v=4","./i18n/strings-el.json?v=9");
+
+    const oldNext="document.getElementById('next').onclick=()=>{if(current&&current[0]<6){data.completed[current[0]]=data.completed[current[0]]||{score:0,metrics:{}};save();openCase(current[0]+1)}};";
+    const newNext="document.getElementById('next').onclick=()=>{if(!current||current[0]>=6)return;if(!data.completed[current[0]]){alert('Ολοκλήρωσε πρώτα την τρέχουσα υπόθεση.');return;}openCase(current[0]+1)};";
+    html=html.replace(oldNext,newNext);
 
     html=html.replace('</style></head>',`.desktop-qr{position:fixed;right:20px;bottom:20px;z-index:40;width:180px;padding:11px;background:rgba(10,14,18,.96);border:1px solid #35404b;box-shadow:0 16px 48px rgba(0,0,0,.45);text-align:center}.desktop-qr img{display:block;width:150px;height:150px;margin:0 auto 8px;background:#fff;padding:5px}.desktop-qr strong{display:block;color:#77e2ff;font-size:.78rem;letter-spacing:.08em}.desktop-qr span{display:block;color:#95a0aa;font-size:.68rem;margin-top:3px}@media(max-width:850px){.desktop-qr{display:none!important}}</style></head>`);
     html=html.replace('<section class="cases">','<div class="desktop-qr"><img src="assets/qr/mobile.png" alt="QR για mobile έκδοση"><strong>ΠΑΙΞΕ ΣΤΟ ΚΙΝΗΤΟ</strong><span>Σκάναρε για το Season Hub</span></div><section class="cases">');
@@ -59,7 +63,6 @@
     for(const [re,to] of fallbackPairs) out=out.replace(re,to);
     return out;
   };
-
   const basePatchCase=patchCase;
   patchCase=function(frame,id){
     basePatchCase(frame,id);
@@ -70,30 +73,20 @@
     const target=d.getElementById('stage')||d.body;
     if(target&&!target.__greekObserver){
       let busy=false;
-      const mo=new MutationObserver(()=>{
-        if(busy)return;busy=true;
-        queueMicrotask(()=>{apply();busy=false});
-      });
+      const mo=new MutationObserver(()=>{if(busy)return;busy=true;queueMicrotask(()=>{apply();busy=false})});
       mo.observe(target,{subtree:true,childList:true,characterData:true});
       target.__greekObserver=mo;
     }
   };
-
-  const relocalize=()=>{
-    try{
-      const f=document.getElementById('caseframe');
-      if(f&&f.contentDocument&&f.contentDocument.body&&typeof current!=='undefined'&&current){
-        translate(f.contentDocument.body,current[0]);
-      }
-    }catch(e){}
-  };
-  setTimeout(relocalize,250);setTimeout(relocalize,900);setTimeout(relocalize,1800);
 })();
 </scr${''}ipt>`;
     html=html.replace('</body>',localizationPatch+'</body>');
 
-    const uiTag='<scr'+'ipt src="./music-ui.js?v=3"></scr'+'ipt>';
+    const uiTag='<scr'+'ipt src="./music-ui.js?v=4"></scr'+'ipt>';
     html=html.replace('</body>',uiTag+'</body>');
+    const controlsPatch='<scr'+'ipt>document.addEventListener("keydown",e=>{if(e.key==="Escape"){const skip=document.getElementById("tourSkip");if(skip){e.preventDefault();e.stopImmediatePropagation();skip.click();}}},true);</scr'+'ipt>';
+    html=html.replace('</body>',controlsPatch+'</body>');
+
     document.open();document.write(html);document.close();
   }catch(e){
     document.body.innerHTML='<div class="loading"><div><strong>THE MUSIC FILES</strong>Αποτυχία φόρτωσης. Κάνε ανανέωση της σελίδας.</div></div>';
