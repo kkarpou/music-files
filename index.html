@@ -12,7 +12,7 @@
 <script>
 (async()=>{
   try{
-    const r=await fetch('./season-v4.html?v=7',{cache:'no-store'});
+    const r=await fetch('./season-v4.html?v=8',{cache:'no-store'});
     if(!r.ok) throw new Error('season-v4');
     let html=await r.text();
 
@@ -23,8 +23,8 @@
     const oldRender="w.render=function(){original();translate(d.getElementById('stage'),id);detect(frame,id)};w.__seasonV4Patched=true";
     const newRender="w.render=function(){original();translate(d.getElementById('stage'),id);const sc=d.querySelector('main');if(sc)sc.scrollTop=0;detect(frame,id)};w.__seasonV4Patched=true";
     html=html.replace(oldRender,newRender);
-    html=html.replaceAll('&v=4&t=','&v=7&t=');
-    html=html.replace("./i18n/strings-el.json?v=4","./i18n/strings-el.json?v=7");
+    html=html.replaceAll('&v=4&t=','&v=8&t=');
+    html=html.replace("./i18n/strings-el.json?v=4","./i18n/strings-el.json?v=8");
 
     html=html.replace('</style></head>',`.desktop-qr{position:fixed;right:20px;bottom:20px;z-index:40;width:180px;padding:11px;background:rgba(10,14,18,.96);border:1px solid #35404b;box-shadow:0 16px 48px rgba(0,0,0,.45);text-align:center}.desktop-qr img{display:block;width:150px;height:150px;margin:0 auto 8px;background:#fff;padding:5px}.desktop-qr strong{display:block;color:#77e2ff;font-size:.78rem;letter-spacing:.08em}.desktop-qr span{display:block;color:#95a0aa;font-size:.68rem;margin-top:3px}@media(max-width:850px){.desktop-qr{display:none!important}}</style></head>`);
     html=html.replace('<section class="cases">','<div class="desktop-qr"><img src="assets/qr/mobile.png" alt="QR για mobile έκδοση"><strong>ΠΑΙΞΕ ΣΤΟ ΚΙΝΗΤΟ</strong><span>Σκάναρε για το Season Hub</span></div><section class="cases">');
@@ -89,7 +89,7 @@
   };
   setTimeout(relocalize,250);setTimeout(relocalize,900);setTimeout(relocalize,1800);
 })();
-<\/script>`;
+</scr${''}ipt>`;
     html=html.replace('</body>',localizationPatch+'</body>');
 
     const uiTag='<scr'+'ipt src="./music-ui.js?v=3"></scr'+'ipt>';
