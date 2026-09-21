@@ -5,87 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#080a0d">
 <title>The Music Files — Σεζόν 1</title>
-<style>html,body{margin:0;width:100%;height:100%;background:#080a0d;color:#eef2f5;font-family:"Segoe UI",Tahoma,Arial,system-ui,sans-serif}.loading{height:100%;display:grid;place-items:center}.loading div{border:1px solid #35404b;padding:18px 24px;color:#95a0aa}.loading strong{display:block;color:#77e2ff;letter-spacing:.14em;margin-bottom:6px}</style>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080a0d}
+#season{display:block;width:100%;height:100%;border:0;background:#080a0d}
+</style>
 </head>
 <body>
-<div class="loading"><div><strong>THE MUSIC FILES</strong>Φόρτωση…</div></div>
-<script>
-(async()=>{
-  try{
-    const r=await fetch('./season-v4.html?v=11',{cache:'no-store'});
-    if(!r.ok) throw new Error('season-v4');
-    let html=await r.text();
-
-    const oldPatch='font.textContent=`html,body,#app,button,input,select,textarea,.subtitle,.copy,.screen,.sidebar,.option,.feature,.tile,.event,.statement,.metric,.row,.cell,.finding,.conclusion,.legend,.side,.casefile{font-family:"Segoe UI",Tahoma,Arial,system-ui,-apple-system,sans-serif!important}.subtitle,.copy{letter-spacing:0!important}`;d.head.appendChild(font);';
-    const newPatch='font.textContent=`html,body,#app,button,input,select,textarea,.subtitle,.copy,.screen,.sidebar,.option,.feature,.tile,.event,.statement,.metric,.row,.cell,.finding,.conclusion,.legend,.side,.casefile{font-family:"Segoe UI",Tahoma,Arial,system-ui,-apple-system,sans-serif!important}.subtitle,.copy{letter-spacing:0!important}html,body{height:100%!important;min-height:100%!important;overflow:hidden!important}#app{height:100dvh!important;min-height:0!important;display:grid!important;grid-template-rows:44px minmax(0,1fr) 50px!important;overflow:hidden!important}main{display:block!important;height:auto!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-y:contain!important;touch-action:pan-y!important;scrollbar-gutter:stable!important;padding-bottom:calc(12px + env(safe-area-inset-bottom))!important}.stage{height:auto!important;min-height:100%!important;overflow:visible!important}.card,.screen,.casefile{height:auto!important;min-height:100%!important;overflow:visible!important}.networkwrap,.compare,.timeline,.report,.model,.cluster,.featuregrid,.grid4,.metrics,.logic,.scenario,.verdicts,.statement-grid,.options{min-height:0!important}@media(max-width:850px){#app{grid-template-rows:38px minmax(0,1fr)!important}.topbar{position:relative!important;top:auto!important}.controls{display:none!important}main{padding:5px 5px calc(16px + env(safe-area-inset-bottom))!important}.stage,.card{min-height:100%!important}.screen,.sidebar{overflow:visible!important}.network{flex:none!important}.covers,.concepts{height:auto!important;min-height:0!important}.matrix{max-width:none!important}}`;d.head.appendChild(font);';
-    html=html.replace(oldPatch,newPatch);
-
-    const oldRender="w.render=function(){original();translate(d.getElementById('stage'),id);detect(frame,id)};w.__seasonV4Patched=true";
-    const newRender="w.render=function(){original();translate(d.getElementById('stage'),id);const sc=d.querySelector('main');if(sc)sc.scrollTop=0;detect(frame,id)};w.__seasonV4Patched=true";
-    html=html.replace(oldRender,newRender);
-    html=html.replaceAll('&v=4&t=','&v=11&t=');
-    html=html.replace("./i18n/strings-el.json?v=4","./i18n/strings-el.json?v=11");
-
-    const oldNext="document.getElementById('next').onclick=()=>{if(current&&current[0]<6){data.completed[current[0]]=data.completed[current[0]]||{score:0,metrics:{}};save();openCase(current[0]+1)}};";
-    const newNext="document.getElementById('next').onclick=()=>{if(!current||current[0]>=6)return;if(!data.completed[current[0]]){alert('Ολοκλήρωσε πρώτα την τρέχουσα υπόθεση.');return;}openCase(current[0]+1)};";
-    html=html.replace(oldNext,newNext);
-
-    html=html.replace('</style></head>',`.desktop-qr{position:fixed;right:20px;bottom:20px;z-index:40;width:180px;padding:11px;background:rgba(10,14,18,.96);border:1px solid #35404b;box-shadow:0 16px 48px rgba(0,0,0,.45);text-align:center}.desktop-qr img{display:block;width:150px;height:150px;margin:0 auto 8px;background:#fff;padding:5px}.desktop-qr strong{display:block;color:#77e2ff;font-size:.78rem;letter-spacing:.08em}.desktop-qr span{display:block;color:#95a0aa;font-size:.68rem;margin-top:3px}@media(max-width:850px){.desktop-qr{display:none!important}}</style></head>`);
-    html=html.replace('<section class="cases">','<div class="desktop-qr"><img src="assets/qr/mobile.png" alt="QR για mobile έκδοση"><strong>ΠΑΙΞΕ ΣΤΟ ΚΙΝΗΤΟ</strong><span>Σκάναρε για το Season Hub</span></div><section class="cases">');
-
-    const localizationPatch=`<script>
-(function(){
-  const fallbackPairs=[
-    [/\\bCASE (0?[1-6])\\b/g,'ΥΠΟΘΕΣΗ $1'],
-    [/\\bATHENS\\b/g,'ΑΘΗΝΑ'],
-    [/NEW UPLOAD DETECTED/g,'ΕΝΤΟΠΙΣΤΗΚΕ ΝΕΑ ΑΝΑΡΤΗΣΗ'],
-    [/TRENDING \\/ ATHENS/g,'ΑΝΟΔΙΚΗ ΤΑΣΗ \\/ ΑΘΗΝΑ'],
-    [/(\\d[\\d,.]*) plays\\b/gi,'$1 αναπαραγωγές'],
-    [/\\bAct I\\b/gi,'Πράξη I'],[/\\bAct II\\b/gi,'Πράξη II'],[/\\bAct III\\b/gi,'Πράξη III'],[/\\bAct IV\\b/gi,'Πράξη IV'],[/\\bAct V\\b/gi,'Πράξη V'],
-    [/\\bLook\\b/g,'Παρατήρηση'],[/\\bConnect\\b/g,'Συνδέσεις'],[/The Bridge/g,'Η Γέφυρα'],[/False lead/gi,'Παραπλανητικό ίχνος'],
-    [/Visual Lab/g,'Εργαστήριο οπτικής ανάλυσης'],[/VISUAL LAB/g,'ΕΡΓΑΣΤΗΡΙΟ ΟΠΤΙΚΗΣ ΑΝΑΛΥΣΗΣ'],
-    [/Network Board/g,'Χάρτης δικτύου'],[/NETWORK BOARD/g,'ΧΑΡΤΗΣ ΔΙΚΤΥΟΥ'],
-    [/CASE LOGIC/g,'ΛΟΓΙΚΗ ΤΕΚΜΗΡΙΩΣΗΣ'],[/Case briefing/g,'Ενημέρωση για την υπόθεση'],
-    [/Visual candidates/g,'Οπτικοί υποψήφιοι'],[/Visual finding/g,'Οπτικό εύρημα'],
-    [/WARNING/g,'ΠΡΟΣΟΧΗ'],[/OBSERVATION/g,'ΠΑΡΑΤΗΡΗΣΗ'],[/UNKNOWN/g,'ΑΓΝΩΣΤΟ'],[/NEXT STEP/g,'ΕΠΟΜΕΝΟ ΒΗΜΑ'],
-    [/Bridge clue/g,'Ένδειξη γέφυρας'],[/NETWORK ROLE/g,'ΡΟΛΟΣ ΣΤΟ ΔΙΚΤΥΟ'],
-    [/Bridge \\/ high betweenness/g,'Γέφυρα \/ υψηλή κεντρικότητα διαμεσολάβησης'],
-    [/Timeline/g,'Χρονολόγιο'],[/Close the case/g,'Κλείσιμο υπόθεσης'],
-    [/Strongest evidence/g,'Ισχυρότερο τεκμήριο'],[/Confidence/g,'Βεβαιότητα'],[/Suspect/g,'Υποψήφιος'],
-    [/Visual similarity/g,'Οπτική ομοιότητα'],[/Number of collaborations/g,'Αριθμός συνεργασιών'],[/Position in network/g,'Θέση στο δίκτυο'],[/Shared label/g,'Κοινή δισκογραφική ετικέτα'],
-    [/Case report/g,'Αναφορά υπόθεσης'],[/Season report/g,'Αναφορά σεζόν'],
-    [/NEW CONNECTION FOUND/g,'ΕΝΤΟΠΙΣΤΗΚΕ ΝΕΑ ΣΥΝΔΕΣΗ'],[/Next case:/g,'Επόμενη υπόθεση:'],
-    [/\\bhint\\b/gi,'βοήθεια']
-  ];
-  const baseTr=tr;
-  tr=function(s,id){
-    let out=baseTr(s,id);
-    for(const [re,to] of fallbackPairs) out=out.replace(re,to);
-    return out;
-  };
-  const basePatchCase=patchCase;
-  patchCase=function(frame,id){
-    basePatchCase(frame,id);
-    const d=frame.contentDocument;
-    try{translate(d.body,id);detect(frame,id)}catch(e){}
-  };
-})();
-</scr${''}ipt>`;
-    html=html.replace('</body>',localizationPatch+'</body>');
-
-    const uiTag='<scr'+'ipt src="./music-ui.js?v=6"></scr'+'ipt>';
-    html=html.replace('</body>',uiTag+'</body>');
-    const fixesTag='<scr'+'ipt src="./ui-fixes-v6.js?v=6"></scr'+'ipt>';
-    html=html.replace('</body>',fixesTag+'</body>');
-    const controlsPatch='<scr'+'ipt>document.addEventListener("keydown",e=>{if(e.key==="Escape"){const skip=document.getElementById("tourSkip");if(skip){e.preventDefault();e.stopImmediatePropagation();skip.click();}}},true);</scr'+'ipt>';
-    html=html.replace('</body>',controlsPatch+'</body>');
-
-    document.open();document.write(html);document.close();
-  }catch(e){
-    document.body.innerHTML='<div class="loading"><div><strong>THE MUSIC FILES</strong>Αποτυχία φόρτωσης. Κάνε ανανέωση της σελίδας.</div></div>';
-    console.error(e);
-  }
-})();
-</script>
+<iframe id="season" src="./season-v4.html?v=12" title="The Music Files — Σεζόν 1"></iframe>
+<script src="./stable-ui-v7.js?v=7"></script>
 </body>
 </html>
