@@ -26,7 +26,8 @@
     html=html.replaceAll('__seasonV4Patched','__seasonV5Patched');
     html=html.replace('</style></head>',`.desktop-qr{position:fixed;right:20px;bottom:20px;z-index:40;width:180px;padding:11px;background:rgba(10,14,18,.96);border:1px solid #35404b;box-shadow:0 16px 48px rgba(0,0,0,.45);text-align:center}.desktop-qr img{display:block;width:150px;height:150px;margin:0 auto 8px;background:#fff;padding:5px}.desktop-qr strong{display:block;color:#77e2ff;font-size:.78rem;letter-spacing:.08em}.desktop-qr span{display:block;color:#95a0aa;font-size:.68rem;margin-top:3px}@media(max-width:850px){.desktop-qr{display:none!important}}</style></head>`);
     html=html.replace('<section class="cases">','<div class="desktop-qr"><img src="assets/qr/mobile.png" alt="QR για mobile έκδοση"><strong>ΠΑΙΞΕ ΣΤΟ ΚΙΝΗΤΟ</strong><span>Σκάναρε για το Season Hub</span></div><section class="cases">');
-    html=html.replace('</body>','<script src="./music-ui.js?v=1"></script></body>');
+    const uiTag='<scr'+'ipt src="./music-ui.js?v=2"></scr'+'ipt>';
+    html=html.replace('</body>',uiTag+'</body>');
     document.open();document.write(html);document.close();
   }catch(e){document.body.innerHTML='<div class="loading"><div><strong>THE MUSIC FILES</strong>Αποτυχία φόρτωσης. Κάνε ανανέωση της σελίδας.</div></div>';console.error(e)}
 })();
