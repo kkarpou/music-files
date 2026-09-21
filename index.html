@@ -12,7 +12,7 @@
 <script>
 (async()=>{
   try{
-    const r=await fetch('./season-v4.html?v=10',{cache:'no-store'});
+    const r=await fetch('./season-v4.html?v=11',{cache:'no-store'});
     if(!r.ok) throw new Error('season-v4');
     let html=await r.text();
 
@@ -23,8 +23,8 @@
     const oldRender="w.render=function(){original();translate(d.getElementById('stage'),id);detect(frame,id)};w.__seasonV4Patched=true";
     const newRender="w.render=function(){original();translate(d.getElementById('stage'),id);const sc=d.querySelector('main');if(sc)sc.scrollTop=0;detect(frame,id)};w.__seasonV4Patched=true";
     html=html.replace(oldRender,newRender);
-    html=html.replaceAll('&v=4&t=','&v=10&t=');
-    html=html.replace("./i18n/strings-el.json?v=4","./i18n/strings-el.json?v=10");
+    html=html.replaceAll('&v=4&t=','&v=11&t=');
+    html=html.replace("./i18n/strings-el.json?v=4","./i18n/strings-el.json?v=11");
 
     const oldNext="document.getElementById('next').onclick=()=>{if(current&&current[0]<6){data.completed[current[0]]=data.completed[current[0]]||{score:0,metrics:{}};save();openCase(current[0]+1)}};";
     const newNext="document.getElementById('next').onclick=()=>{if(!current||current[0]>=6)return;if(!data.completed[current[0]]){alert('Ολοκλήρωσε πρώτα την τρέχουσα υπόθεση.');return;}openCase(current[0]+1)};";
@@ -73,8 +73,10 @@
 </scr${''}ipt>`;
     html=html.replace('</body>',localizationPatch+'</body>');
 
-    const uiTag='<scr'+'ipt src="./music-ui.js?v=5"></scr'+'ipt>';
+    const uiTag='<scr'+'ipt src="./music-ui.js?v=6"></scr'+'ipt>';
     html=html.replace('</body>',uiTag+'</body>');
+    const fixesTag='<scr'+'ipt src="./ui-fixes-v6.js?v=6"></scr'+'ipt>';
+    html=html.replace('</body>',fixesTag+'</body>');
     const controlsPatch='<scr'+'ipt>document.addEventListener("keydown",e=>{if(e.key==="Escape"){const skip=document.getElementById("tourSkip");if(skip){e.preventDefault();e.stopImmediatePropagation();skip.click();}}},true);</scr'+'ipt>';
     html=html.replace('</body>',controlsPatch+'</body>');
 
