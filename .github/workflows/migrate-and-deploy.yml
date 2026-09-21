@@ -1,0 +1,133 @@
+name: Migrate Music Files and deploy Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/migrate-and-deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: music-files-migration
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout destination
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch current Music Files source
+        run: |
+          git clone --depth 1 https://github.com/kkarpou/museum-after-hours.git /tmp/museum-after-hours
+          rsync -a --delete --exclude='.git' --exclude='.github' /tmp/museum-after-hours/music-files/ ./
+
+      - name: Restructure standalone repository
+        run: |
+          mv index.html case01.html
+          python3 - <<'PY'
+          from pathlib import Path
+
+          # Case 01 used to be the index of the old subfolder. In the standalone
+          # repository the root index is the Season Hub.
+          p = Path('season-v4.html')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace("[1,'The Missing Producer','./',", "[1,'The Missing Producer','case01.html',", 1)
+          p.write_text(s, encoding='utf-8')
+
+          # Point all public/mobile references to the new standalone site.
+          old = 'https://kkarpou.github.io/museum-after-hours/music-files/season.html'
+          new = 'https://kkarpou.github.io/music-files/'
+          for name in ['season-v5.html','season-v4.html']:
+              q = Path(name)
+              if q.exists():
+                  txt = q.read_text(encoding='utf-8').replace(old, new)
+                  q.write_text(txt, encoding='utf-8')
+
+          # The current stable wrapper becomes the root entry point.
+          Path('index.html').write_text(Path('season-v5.html').read_text(encoding='utf-8'), encoding='utf-8')
+
+          # Keep a backwards-compatible season.html inside the new repo.
+          Path('season.html').write_text('''<!doctype html><html lang="el"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0; url=./"><script>location.replace('./');</script><title>The Music Files</title></head><body></body></html>''', encoding='utf-8')
+
+          # Old intermediate builds are no longer entry points.
+          for old_file in ['season-el.html','season-v2.html','season-v3.html']:
+              Path(old_file).unlink(missing_ok=True)
+
+          Path('.nojekyll').write_text('', encoding='utf-8')
+          PY
+
+      - name: Generate QR for new mobile/responsive URL
+        run: |
+          python3 -m pip install --quiet 'qrcode[pil]'
+          python3 - <<'PY'
+          import qrcode
+          from pathlib import Path
+          Path('assets/qr').mkdir(parents=True, exist_ok=True)
+          img=qrcode.make('https://kkarpou.github.io/music-files/')
+          img.save('assets/qr/mobile.png')
+          PY
+
+      - name: Write Greek project README
+        run: |
+          cat > README.md <<'EOF'
+          # The Music Files
+
+          Διαδραστική εκπαιδευτική σειρά serious games για τον γραμματισμό στα μέσα, την οπτική ανάλυση, την ανάλυση δικτύων και την κριτική ερμηνεία δεδομένων.
+
+          Η πρώτη σεζόν περιλαμβάνει έξι υποθέσεις που εξερευνούν την οπτική ομοιότητα, τα δίκτυα συνεργασιών, τις κοινότητες, τα μεταδεδομένα, τη χρονολογική σειρά και τα μοντέλα πρόβλεψης.
+
+          **Κεντρική αρχή:** ένα μοτίβο αποτελεί ένδειξη — όχι από μόνο του εξήγηση.
+
+          ## Σεζόν 1
+
+          1. The Missing Producer
+          2. The Lost Comeback
+          3. The Copycat
+          4. The Feature
+          5. The Ghost Label
+          6. The Algorithm
+
+          Το παιχνίδι είναι responsive και το ίδιο URL χρησιμοποιείται σε desktop και κινητό.
+          EOF
+
+      - name: Set Greek repository description
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method PATCH "repos/${GITHUB_REPOSITORY}" \
+            -f description='Διαδραστική εκπαιδευτική σειρά serious games για τον γραμματισμό στα μέσα, την οπτική ανάλυση, τα δίκτυα και την κριτική ερμηνεία δεδομένων.' \
+            || echo 'Repository description requires a manual GitHub setting change.'
+
+      - name: Commit migrated standalone project
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Migrate Music Files to standalone repository' || true
+          git push origin main
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
